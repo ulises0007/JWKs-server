@@ -21,12 +21,12 @@ var (
 )
 
 func main() {
-  http.HandleFunc("/jwks", jwksHandler)
+  http.HandleFunc("/jwks", jwksH)
   http.HandleFunc("/auth", authHandler)
   log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func jwksHandler(w http.ResponseWriter, r *http.Request) {
+func jwksH(w http.ResponseWriter, r *http.Request) {
   keysToServe := make(map[string]interface{})
   for kid, key := range keys {
     if !keysExpiration[kid].Before(time.Now()) {
@@ -81,7 +81,7 @@ func init() {
   // Generate RSA key pairs
   key, err := rsa.GenerateKey(rand.Reader, 2048)
   if err != nil {
-    log.Fatalf("Failed to generate RSA key pair: %v", err)
+    log.Fatalf("Failed to generate RSA: %v", err)
   }
   keys["default"] = key
   keysExpiration["default"] = time.Now().Add(24 * time.Hour)
@@ -89,7 +89,7 @@ func init() {
   // Generate an expired RSA key pair
   expiredKey, err := rsa.GenerateKey(rand.Reader, 2048)
   if err != nil {
-    log.Fatalf("Failed to generate RSA key pair: %v", err)
+    log.Fatalf("Failed to generate RSA: %v", err)
   }
   keys["expired"] = expiredKey
   keysExpiration["expired"] = time.Now().Add(-24 * time.Hour)
